@@ -1,0 +1,38 @@
+version: '3'
+services:
+    mongo:
+        image: mongo:3.4-jessie
+        container_name: mongo
+        networks:
+                docker_session_2:
+                        ipv4_address: 192.168.50.10
+                        aliases:
+                                - db
+
+        tty: true
+        stdin_open: true
+        restart: always
+        volumes:
+            - ~/standalone/db:/data/db
+
+
+    service:
+        image: standalone
+        container_name: standalone
+        build: docker
+        networks:
+                docker_session_2:
+                        ipv4_address: 192.168.50.20
+                        aliases:
+                                - standalone
+        ports:
+            - 8080:8080
+        depends_on:
+            - mongo
+
+networks:
+    docker_session_2:
+        driver: bridge
+        ipam:
+            driver: default
+            config: [{subnet: 192.168.50.0/24}]
